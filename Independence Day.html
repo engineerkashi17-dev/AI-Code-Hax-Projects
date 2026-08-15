@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>14 August - Custom Audio Celebration</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #020503;
+            color: #ffffff;
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+            text-align: center;
+        }
+
+        /* Pure Cyber Neon Flag Container */
+        .flag-container {
+            position: relative;
+            width: 260px;
+            height: 170px;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 25px;
+            animation: wave 2.5s ease-in-out infinite alternate, borderNeonShift 6s linear infinite;
+        }
+
+        /* Pakistani Flag Structure */
+        .flag {
+            display: flex;
+            width: 100%;
+            height: 100%;
+        }
+
+        .white-bar {
+            width: 25%;
+            background-color: #ffffff;
+            box-shadow: inset -5px 0 20px rgba(255,255,255,0.6);
+        }
+
+        .green-bar {
+            width: 75%;
+            background-color: #001a0c;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Neon Crescent and Star */
+        .crescent {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            background-color: #ffffff;
+            border-radius: 50%;
+            transform: rotate(-35deg);
+            filter: drop-shadow(0 0 12px #ffffff);
+        }
+
+        .crescent::after {
+            content: '';
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            background-color: #001a0c;
+            border-radius: 50%;
+            top: 2px;
+            left: 15px;
+        }
+
+        .star {
+            position: absolute;
+            top: 38px;
+            left: 95px;
+            font-size: 28px;
+            color: #ffffff;
+            transform: rotate(-35deg);
+            filter: drop-shadow(0 0 12px #ffffff);
+        }
+
+        /* Animations */
+        @keyframes wave {
+            0% { transform: translateY(0) scale(1) rotate(0deg); }
+            100% { transform: translateY(-10px) scale(1.02) rotate(1deg); }
+        }
+
+        @keyframes borderNeonShift {
+            0% { box-shadow: 0 0 20px #00ff66, 0 0 40px #ffffff; }
+            25% { box-shadow: 0 0 20px #00ffff, 0 0 40px #00ff66; }
+            50% { box-shadow: 0 0 20px #ff00ff, 0 0 40px #00ffff; }
+            75% { box-shadow: 0 0 20px #ffff00, 0 0 40px #ff00ff; }
+            100% { box-shadow: 0 0 20px #00ff66, 0 0 40px #ffffff; }
+        }
+
+        /* Typography */
+        h1 {
+            font-size: 2rem;
+            margin: 10px 0;
+            font-weight: 900;
+            color: #ffffff;
+            text-shadow: 0 0 10px #00ff66, 0 0 20px #00ff66;
+            letter-spacing: 1px;
+            padding: 0 10px;
+        }
+
+        .wishes {
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin: 5px 0;
+            animation: textNeonShift 5s infinite linear;
+            letter-spacing: 0.5px;
+            padding: 0 15px;
+            word-wrap: break-word;
+        }
+
+        @keyframes textNeonShift {
+            0% { color: #00ff66; text-shadow: 0 0 10px #00ff66; }
+            25% { color: #00ffff; text-shadow: 0 0 10px #00ffff; }
+            50% { color: #ff00ff; text-shadow: 0 0 10px #ff00ff; }
+            75% { color: #ffff00; text-shadow: 0 0 10px #ffff00; }
+            100% { color: #00ff66; text-shadow: 0 0 10px #00ff66; }
+        }
+
+        /* Custom File Music Audio Selection Section */
+        .audio-uploader {
+            margin-top: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 8px 15px;
+            border-radius: 20px;
+            border: 1px dashed #00ffff;
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.2);
+            font-size: 0.85rem;
+            cursor: pointer;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+
+        .audio-uploader:hover {
+            border-color: #00ff66;
+            box-shadow: 0 0 15px rgba(0, 255, 102, 0.4);
+        }
+
+        .audio-uploader input[type="file"] {
+            display: none;
+        }
+
+        /* Buttons Layout */
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            z-index: 10;
+            padding: 0 10px;
+        }
+
+        .celebrate-btn {
+            background: transparent;
+            color: #ffffff;
+            border: 2px solid #00ffff;
+            padding: 10px 20px;
+            font-size: 0.95rem;
+            font-weight: bold;
+            border-radius: 30px;
+            cursor: pointer;
+            box-shadow: 0 0 12px rgba(0, 255, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .celebrate-btn:hover {
+            background: #00ffff;
+            color: #020503;
+            box-shadow: 0 0 20px #00ffff;
+        }
+
+        .music-btn {
+            border-color: #00ff66;
+            box-shadow: 0 0 12px rgba(0, 255, 102, 0.3);
+        }
+
+        .music-btn:hover {
+            background: #00ff66;
+            color: #020503;
+            box-shadow: 0 0 20px #00ff66;
+        }
+
+        /* Credits Footer */
+        .developer-credits {
+            margin-top: 40px;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+            color: rgba(255, 255, 255, 0.8);
+            background: rgba(255, 255, 255, 0.03);
+            padding: 8px 18px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            max-width: 90%;
+            font-weight: bold;
+        }
+
+        .developer-credits span.ai-name {
+            font-weight: bold;
+            animation: textNeonShift 4s infinite linear;
+        }
+
+        .developer-credits span.dev-name {
+            font-weight: bold;
+            animation: textNeonShift 6s infinite linear reverse;
+        }
+
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="fireworksCanvas"></canvas>
+
+    <!-- HTML5 Dynamic Audio element placeholder -->
+    <audio id="milliNaghma" loop></audio>
+
+    <div class="flag-container">
+        <div class="flag">
+            <div class="white-bar"></div>
+            <div class="green-bar">
+                <div class="crescent"></div>
+                <div class="star">&#9733;</div>
+            </div>
+        </div>
+    </div>
+
+    <h1>14 August Mubarak!</h1>
+    <p class="wishes">⚡ JASHN-E-AZADI MUBARAK ⚡</p>
+
+    <!-- Custom Mp3 Audio File Option Selection Box -->
+    <label class="audio-uploader">
+        🎵 Select/Add Your Naghma (MP3)
+        <input type="file" id="audioFile" accept="audio/*" onchange="loadLocalAudio(event)">
+    </label>
+
+    <div class="btn-group">
+        <button class="celebrate-btn" onclick="userTriggerRocket()">Celebrate 🎉</button>
+        <button class="celebrate-btn music-btn" id="musicBtn" onclick="toggleMusic()">Play Anthem 🎵</button>
+    </div>
+
+    <div class="developer-credits">
+        AI Thinker by <span class="ai-name">Co-Pilot</span> & Developer <span class="dev-name">Kashi Maher</span>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('fireworksCanvas');
+        const ctx = canvas.getContext('2d');
+        const audio = document.getElementById('milliNaghma');
+        const musicBtn = document.getElementById('musicBtn');
+
+        let audioCtx = null;
+        let isAudioLoaded = false;
+
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        }
+
+        // Handles uploading local audio securely from phone storage bypasses security blocks
+        function loadLocalAudio(event) {
+            initAudio();
+            const file = event.target.files[0];
+            if (file) {
+                const fileURL = URL.createObjectURL(file);
+                audio.src = fileURL;
+                isAudioLoaded = true;
+                alert("Song added successfully! Now click 'Play Anthem' to enjoy! 🎵");
+                musicBtn.innerText = "Play Anthem 🎵";
+            }
+        }
+
+        // Procedural Firework Sound Generator
+        function playBlastSound() {
+            initAudio();
+            if (!audioCtx) return;
+
+            let bufferSize = audioCtx.sampleRate * 0.15;
+            let buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+            let data = buffer.getChannelData(0);
+            for (let i = 0; i < bufferSize; i++) {
+                data[i] = Math.random() * 2 - 1;
+            }
+
+            let noise = audioCtx.createBufferSource();
+            noise.buffer = buffer;
+
+            let filter = audioCtx.createBiquadFilter();
+            filter.type = 'lowpass';
+            filter.frequency.setValueAtTime(400, audioCtx.currentTime);
+            filter.frequency.exponentialRampToValueAtTime(10, audioCtx.currentTime + 0.15);
+
+            let gain = audioCtx.createGain();
+            gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
+
+            noise.connect(filter);
+            filter.connect(gain);
+            gain.connect(audioCtx.destination);
+            noise.start();
+        }
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        let particles = [];
+        let rockets = [];
+
+        function getRandomNeonColor() {
+            const neonColors = ['#00ff66', '#00ffff', '#ff00ff', '#ffff00', '#ffffff', '#33ff99'];
+            return neonColors[Math.floor(Math.random() * neonColors.length)];
+        }
+
+        class Rocket {
+            constructor(targetX, targetY) {
+                this.x = Math.random() * canvas.width;
+                this.y = canvas.height;
+                this.targetX = targetX;
+                this.targetY = targetY;
+                this.color = '#ffffff';
+                this.speed = 12;
+                
+                let angle = Math.atan2(this.targetY - this.y, this.targetX - this.x);
+                this.velocity = {
+                    x: Math.cos(angle) * this.speed,
+                    y: Math.sin(angle) * this.speed
+                };
+            }
+
+            draw() {
+                ctx.save();
+                ctx.shadowBlur = 15;
+                ctx.shadowColor = '#00ff66';
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, 3, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+                ctx.restore();
+            }
+
+            update() {
+                this.x += this.velocity.x;
+                this.y += this.velocity.y;
+
+                if (Math.random() > 0.4) {
+                    particles.push(new Particle(this.x, this.y, '#00ff66', true));
+                }
+
+                if (this.y <= this.targetY) {
+                    explode(this.x, this.y);
+                    return false;
+                }
+                return true;
+            }
+        }
+
+        class Particle {
+            constructor(x, y, color, isTrail = false) {
+                this.x = x;
+                this.y = y;
+                this.color = color;
+                this.radius = isTrail ? Math.random() * 1.5 + 0.5 : Math.random() * 2.5 + 1;
+                this.velocity = isTrail ? { x: (Math.random() - 0.5) * 2, y: Math.random() * 2 } : {
+                    x: (Math.random() - 0.5) * 12,
+                    y: (Math.random() - 0.5) * 12
+                };
+                this.alpha = 1;
+                this.decay = isTrail ? 0.05 : Math.random() * 0.015 + 0.01;
+            }
+
+            draw() {
+                ctx.save();
+                ctx.globalAlpha = this.alpha;
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+                ctx.restore();
+            }
+
+            update() {
+                this.x += this.velocity.x;
+                this.y += this.velocity.y;
+                if(this.radius > 1.5) this.velocity.y += 0.05;
+                this.alpha -= this.decay;
+            }
+        }
+
+        function explode(x, y) {
+            playBlastSound();
+            const burstColor1 = getRandomNeonColor();
+            const burstColor2 = getRandomNeonColor();
+
+            for (let i = 0; i < 60; i++) {
+                const finalColor = Math.random() > 0.5 ? burstColor1 : burstColor2;
+                particles.push(new Particle(x, y, finalColor));
+            }
+        }
+
+        function triggerAmbientRocket() {
+            const targetX = Math.random() * canvas.width;
+            const targetY = Math.random() * (canvas.height * 0.5);
+            rockets.push(new Rocket(targetX, targetY));
+        }
+        setInterval(triggerAmbientRocket, 1800);
+
+        function userTriggerRocket() {
+            initAudio();
+            for(let k = 0; k < 3; k++) {
+                setTimeout(() => {
+                    const targetX = Math.random() * canvas.width;
+                    const targetY = Math.random() * (canvas.height * 0.5);
+                    rockets.push(new Rocket(targetX, targetY));
+                }, k * 200);
+            }
+        }
+
+        function toggleMusic() {
+            initAudio();
+            if (!isAudioLoaded) {
+                alert("Pehle 'Select/Add Your Naghma' par click kar ke koi audio select karein!");
+                return;
+            }
+            if (audio.paused) {
+                audio.play().catch(function(e) { console.log(e); });
+                musicBtn.innerText = "Pause Music ⏸️";
+            } else {
+                audio.pause();
+                musicBtn.innerText = "Play Anthem 🎵";
+            }
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            ctx.fillStyle = 'rgba(2, 5, 3, 0.25)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            rockets = rockets.filter(rocket => rocket.update());
+            rockets.forEach(rocket => rocket.draw());
+
+            particles.forEach((particle, index) => {
+                if (particle.alpha <= 0) {
+                    particles.splice(index, 1);
+                } else {
+                    particle.update();
+                    particle.draw();
+                }
+            });
+        }
+        animate();
+    </script>
+</body>
+</html>
