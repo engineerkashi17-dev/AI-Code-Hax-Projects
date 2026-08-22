@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snake Game Pro APK</title>
+    <style>
+        body {
+            background-color: #0b0f19;
+            color: #ffffff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 10px;
+            box-sizing: border-box;
+            user-select: none;
+        }
+        .game-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            max-width: 360px; /* Choti screen par responsive alignment */
+        }
+        .status-bar {
+            display: flex;
+            width: 100%;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            font-weight: bold;
+            font-size: 13px;
+            letter-spacing: 1px;
+        }
+        .status-bar div {
+            background: #0d1117;
+            padding: 6px 12px;
+            border-radius: 4px;
+            border: 1px solid #00ff66;
+            box-shadow: 0 0 8px rgba(0,255,102,0.2);
+        }
+        .menu-btn {
+            background: #0d1117;
+            border: 2px solid #00ff66;
+            color: #00ff66;
+            padding: 5px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 12px;
+            box-shadow: 0 0 8px rgba(0,255,102,0.3);
+        }
+        .canvas-container {
+            position: relative;
+            width: 320px;   /* FIXED: Screen par fit karne ke liye 320px kiya */
+            height: 320px;
+            margin: 0 auto;
+        }
+        canvas {
+            background: #111522;
+            border: 3px solid #00ff66;
+            box-shadow: 0 0 15px #00ff66;
+            width: 100%;
+            height: 100%;
+            border-radius: 8px;
+            transition: all 0.4s ease;
+        }
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(11, 15, 25, 0.95);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-sizing: border-box;
+            z-index: 10;
+        }
+        #gameOverScreen { border: 2px solid #ff0033; box-shadow: 0 0 15px #ff0033; }
+        #settingsScreen { border: 2px solid #00ffff; box-shadow: 0 0 15px #00ffff; }
+        .overlay h2 { font-size: 24px; margin: 0 0 12px 0; text-shadow: 0 0 8px currentColor; }
+        .restart-btn {
+            background: #ff0033; color: white; border: none;
+            padding: 10px 22px; font-size: 15px; font-weight: bold;
+            border-radius: 5px; cursor: pointer; box-shadow: 0 0 8px #ff0033;
+        }
+        .settings-group { display: flex; flex-direction: column; gap: 10px; width: 80%; }
+        .toggle-container { display: flex; gap: 6px; justify-content: space-between; }
+        
+        .toggle-btn {
+            flex: 1; background: #0d1117; border: 2px solid #00ff66; color: #00ff66;
+            padding: 8px 4px; font-size: 11px; font-weight: bold; border-radius: 4px; cursor: pointer;
+        }
+        .toggle-btn.active { background: #00ff66; color: #0b0f19; }
+        .level-container { display: flex; gap: 4px; justify-content: space-between; }
+        
+        .lvl-btn {
+            flex: 1; background: #0d1117; border: 2px solid #ffaa00; color: #ffaa00;
+            padding: 8px 4px; font-size: 11px; font-weight: bold; border-radius: 4px; cursor: pointer;
+        }
+        .lvl-btn.active { background: #ffaa00; color: #0b0f19; }
+
+        .spd-btn {
+            flex: 1; background: #0d1117; border: 2px solid #ff00ff; color: #ff00ff;
+            padding: 8px 4px; font-size: 11px; font-weight: bold; border-radius: 4px; cursor: pointer;
+        }
+        .spd-btn.active { background: #ff00ff; color: #0b0f19; }
+                /* FIXED: Logout account button ko compact kiya taake close menu frame me fit aaye */
+        .logout-btn-premium {
+            background: #0d1117;
+            color: #00ffff;
+            border: 2px solid #00ffff;
+            border-radius: 6px;
+            padding: 7px; /* Padding kam ki taake button ki height choti ho jaye */
+            font-size: 13px; /* Font size halka sa chota kiya */
+            font-weight: bold;
+            letter-spacing: 1px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 2px;
+            margin-bottom: 2px;
+            text-shadow: 0 0 8px #00ffff;
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.2);
+            text-transform: uppercase;
+            transition: all 0.2s ease;
+        }
+        .logout-btn-premium:hover {
+            background: #111a24;
+            box-shadow: 0 0 15px #00ffff;
+        }
+
+        .logout-btn-premium:hover { background: #111a24; box-shadow: 0 0 15px #00ffff; }
+
+        .game-buttons-panel {
+            display: none; grid-template-columns: repeat(3, 1fr); gap: 4px;
+            width: 100%; margin-top: 12px;
+        }
+        .g-btn {
+            background: #0d1117; border: 2px solid #00ff66; color: #00ff66;
+            padding: 12px; font-size: 15px; font-weight: bold; border-radius: 6px; text-align: center;
+        }
+        .g-btn:active { background: #00ff66; color: #0d1117; }
+        .u-row { grid-column: 2; }
+        .l-row { grid-column: 1; }
+        .d-row { grid-column: 2; }
+        .r-row { grid-column: 3; }
+        
+        .dev-info { 
+            font-size: 12px; margin-top: 20px; text-align: center; width: 100%;
+            display: flex; flex-wrap: wrap; align-items: center; justify-content: center;
+            gap: 5px; line-height: 1.8; padding: 0 5px; box-sizing: border-box;
+            color: #ffffff; font-weight: bold;
+        }
+        .lbl-item { display: inline-block; white-space: nowrap; }
+        .lbl-neon-red { color: #ff0033; text-shadow: 0 0 5px #ff0033; }
+        .lbl-neon-green { color: #00ff66; text-shadow: 0 0 5px #00ff66; }
+        .copilot-name-random { animation: waveShiftCopilot 3.5s infinite linear; font-weight: 900; }
+
+        @keyframes waveShiftCopilot {
+            0% { color: #00f0ff; text-shadow: 0 0 6px #00f0ff; }
+            20% { color: #0055ff; text-shadow: 0 0 6px #0055ff; }
+            40% { color: #ff00ff; text-shadow: 0 0 6px #ff00ff; }
+            60% { color: #00ff66; text-shadow: 0 0 6px #00ff66; }
+            80% { color: #ffaa00; text-shadow: 0 0 6px #ffaa00; }
+            100% { color: #00f0ff; text-shadow: 0 0 6px #00f0ff; }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div class="status-bar">
+            <div>SCORE: <span id="score">0</span></div>
+            <button class="menu-btn" id="btnMenu">⚙️ MENU</button>
+            <div>HIGH: <span id="highscore">0</span></div>
+        </div>
+        <div class="canvas-container" id="touchZone">
+            <canvas id="gameCanvas" width="400" height="400"></canvas>
+            
+            <div id="gameOverScreen" class="overlay" style="color: #ff0033;">
+                <h2>GAME OVER</h2>
+                <p style="color:#fff; margin:0 0 10px 0; font-size:14px;">Score: <span id="finalScore">0</span></p>
+                <button class="restart-btn" id="btnRestart" style="margin-bottom: 8px;">🔄 PLAY AGAIN</button>
+                <button class="restart-btn" id="btnBackToMenu" style="background:#00ffff; color:#0b0f19; box-shadow: 0 0 8px #00ffff;">⚙️ MAIN MENU</button>
+            </div>
+
+            <div id="settingsScreen" class="overlay" style="color: #00ffff;">
+                <h2>OPTIONS MENU</h2>
+                <div class="settings-group">
+                    <div style="text-align:center; font-size:12px; color:#00ff66; font-weight:bold;">CHOOSE CONTROLS:</div>
+                    <div class="toggle-container">
+                        <button class="toggle-btn" id="ctrlBtnMode">🎮 USE BUTTONS</button>
+                        <button class="toggle-btn active" id="ctrlTouchMode">👆 USE TOUCH</button>
+                    </div>
+
+                    <div style="text-align:center; font-size:12px; color:#ff00ff; font-weight:bold;">GAME SPEED:</div>
+                    <div class="level-container">
+                        <button class="spd-btn" id="spdSlow">SLOW</button>
+                        <button class="spd-btn active" id="spdNormal">NORMAL</button>
+                        <button class="spd-btn" id="spdFast">FAST</button>
+                    </div>
+
+                    <div style="text-align:center; font-size:12px; color:#ffaa00; font-weight:bold;">SELECT LEVEL:</div>
+                    <div class="level-container">
+                        <button class="lvl-btn active" id="lvlEasy">EASY</button>
+                        <button class="lvl-btn" id="lvlMedium">MEDIUM</button>
+                        <button class="lvl-btn" id="lvlHard">HARD</button>
+                    </div>
+                    
+                    <button class="logout-btn-premium" id="btnLogout">LOGOUT ACCOUNT</button>
+                    <button class="restart-btn" id="btnCloseMenu" style="background:#ffffff; color:#0b0f19; box-shadow: 0 0 8px #ffffff; padding:5px; font-size:12px; margin-top:2px;">CLOSE MENU</button>
+                </div>
+            </div>
+        </div>
+        <div class="game-buttons-panel" id="externalButtonsPad">
+            <div class="g-btn u-row" id="gUp">▲</div>
+            <div class="g-btn l-row" id="gLeft">◀</div>
+            <div class="g-btn d-row" id="gDown">▼</div>
+            <div class="g-btn r-row" id="gRight">▶</div>
+        </div>
+        
+        <div class="dev-info">
+            <span class="lbl-item"><span class="lbl-neon-red">Developer:</span> <span class="lbl-neon-green">Kashi_Maher</span></span>
+            <span style="color: #ffffff; margin: 0 1px;">&</span>
+            <span class="lbl-item">Co_Pilot : <span class="copilot-name-random">AIthinker</span></span>
+            <span class="lbl-item">@since 18 Aug 2026</span>
+        </div>
+    </div>
+
+    <!-- 🔊 Audio Files Channels Setup (Aapke exact custom files name lagaye hain) -->
+    <audio id="bgMusic" src="background.mp3" preload="auto" loop></audio>
+    <audio id="eatSound" src="highscore.mp3" preload="auto"></audio> 
+    <audio id="gameOverSound" src="gameover.mp3" preload="auto"></audio>
+    <audio id="levelUpSound" src="nextlevel.mp3" preload="auto"></audio>
+
+    <script>
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
+        const gridSize = 20;
+        const tileCount = canvas.width / gridSize;
+        
+        let snake = [{x: 10, y: 10}, {x: 9, y: 10}, {x: 8, y: 10}];
+        let food = {x: 5, y: 5};
+        let badFood = {x: -1, y: -1}; 
+        
+        let dx = 1; let dy = 0;
+        let score = 0; let highScore = 0;
+        
+        let isPaused = false; let isGameOver = false; let isMenuOpen = false;
+        let hasGameStarted = false; 
+let isBGMEnabled = true;
+let isSFXEnabled = true;
+
+        let snakeColor = "#00ffff";
+        let foodColor = "#ffaa00"; let badFoodColor = "#ff00ff";
+        
+        let currentMode = "Easy"; let controlType = "Touch";
+        let gameSpeed = 160; 
+        let defaultSpeed = 160;                         
+                    // FIXED: Shuruat me saamp ko crash hone se bachane ke liye load configurations zero ki
+        window.addEventListener("DOMContentLoaded", () => {
+            isMenuOpen = true;
+            document.getElementById("settingsScreen").style.display = "flex";
+            
+            // Initial variables explicitly reset taake automatic zero level loading clear ho
+            dx = 1; dy = 0;
+            isPaused = false;
+            isGameOver = false;
+            hasGameStarted = false;
+            badFood = {x: -1, y: -1}; // Medium mode ka poison khana shuru me screen se out rakha
+
+            let bgMusic = document.getElementById("bgMusic");
+            if (bgMusic) {
+                document.body.addEventListener("click", () => {
+                    if(!hasGameStarted) bgMusic.play().catch(e => console.log("Lobby sound ready"));
+                }, { once: true });
+            }
+            generateFood();
+            drawGame(); // Loop se pehle single safe canvas setup draw kiya
+        });
+
+        let foodFlashToggle = true;
+        let flashCounter = 0;
+
+        // Hardcore variables
+        let currentLevelNumber = 1;
+        let normalFoodEaten = 0;
+        let isSpecialFoodActive = false;
+        let specialFoodTimer = null;
+        let specialFoodX = 0;
+        let specialFoodY = 0;
+        let obstaclesArray = [];
+
+        const colorsPool = ["#ffaa00", "#00ff66", "#ffff00", "#ff3366", "#33ffae", "#9933ff", "#ff00ff", "#00ffff"];
+
+        // Lobby music load listener
+        window.addEventListener("DOMContentLoaded", () => {
+            let bgMusic = document.getElementById("bgMusic");
+            if (bgMusic) {
+                document.body.addEventListener("click", () => {
+                    if(!hasGameStarted) bgMusic.play().catch(e => console.log("Audio lock resolution"));
+                }, { once: true });
+            }
+            generateFood();
+            gameLoop();
+        });
+
+        function gameLoop() {
+            if (hasGameStarted && !isPaused && !isGameOver && !isMenuOpen) {
+                updateSnake();
+                if (checkGameOver() && !isGameOver) triggerGameOver();
+                
+                flashCounter++;
+                if (flashCounter % 3 === 0) {
+                    foodFlashToggle = !foodFlashToggle;
+                }
+            }
+            drawGame();
+            setTimeout(gameLoop, gameSpeed);
+        }
+        function updateSnake() {
+            let nextX = snake[0].x + dx;
+            let nextY = snake[0].y + dy;
+            if (currentMode === "Hard") {
+                if (nextX < 0 || nextX >= tileCount || nextY < 0 || nextY >= tileCount) {
+                    triggerGameOver(); return;
+                }
+            } else {
+                if (nextX < 0) nextX = tileCount - 1;
+                if (nextX >= tileCount) nextX = 0;
+                if (nextY < 0) nextY = tileCount - 1;
+                if (nextY >= tileCount) nextY = 0;
+            }
+            const head = {x: nextX, y: nextY};
+            
+            if (currentMode === "Hard") {
+                for (let i = 0; i < obstaclesArray.length; i++) {
+                    if (head.x === obstaclesArray[i].x && head.y === obstaclesArray[i].y) {
+                        triggerGameOver(); return;
+                    }
+                }
+            }
+            if (currentMode === "Medium") {
+                let sX = head.x;
+                let sY = head.y;
+                let hitTopWall = (sY === 5 && sX >= 3 && sX < tileCount - 3);
+                let hitBottomWall = (sY === 14 && sX >= 3 && sX < tileCount - 3);
+                if (hitTopWall || hitBottomWall) {
+                    triggerGameOver(); return;
+                }
+            }
+
+            snake.unshift(head);
+            
+            let ateNormalFood = (head.x === food.x && head.y === food.y);
+            let ateSpecialFood = (currentMode === "Hard" && isSpecialFoodActive && head.x === specialFoodX && head.y === specialFoodY);
+
+            if (ateNormalFood || ateSpecialFood) {
+                let eatSound = document.getElementById("eatSound");
+                if (eatSound) eatSound.play();
+
+                if (currentMode === "Hard" && isSpecialFoodActive && ateSpecialFood) {
+                    clearTimeout(specialFoodTimer);
+                    isSpecialFoodActive = false;
+                    levelUpGame();
+                    return;
+                }
+
+                score++;
+                document.getElementById("score").innerText = score;
+                if (score > highScore) {
+                    highScore = score;
+                    document.getElementById("highscore").innerText = highScore;
+                }
+                
+                if (currentMode === "Hard") {
+                    normalFoodEaten++;
+                    if (normalFoodEaten >= 10) {
+                        normalFoodEaten = 0;
+                        spawnSpecialFood();
+                    } else {
+                        snakeColor = foodColor;
+                        generateFood();
+                    }
+                } else {
+                    snakeColor = foodColor;
+                    generateFood();
+                }
+            } else {
+                snake.pop();
+            }
+        }    
+       function generateFood() {
+           food.x = Math.floor(Math.random() * tileCount);
+           food.y = Math.floor(Math.random() * tileCount);
+    
+    // Target dany ka neon rang maze se random badlega
+    foodColor = colorsPool[Math.floor(Math.random() * colorsPool.length)];
+
+    // FIXED: Medium mode me deewar block ko screen ke center par bilkul fix kar diya
+    if (currentMode === "Medium") {
+        badFood.x = 7; 
+        badFood.y = 12;
+        badFoodColor = "#00ff66"; 
+    } else {
+        badFood = {x: -1, y: -1};
+    }
+}
+
+        function spawnSpecialFood() {
+            isSpecialFoodActive = true;
+            specialFoodX = Math.floor(Math.random() * tileCount);
+            specialFoodY = Math.floor(Math.random() * tileCount);
+
+            specialFoodTimer = setTimeout(() => {
+                if (isSpecialFoodActive) {
+                    isSpecialFoodActive = false;
+                    addMoreObstacles();
+                    generateFood();
+                }
+            }, 5000);
+        }
+
+        function addMoreObstacles() {
+            for (let i = 0; i < 2; i++) {
+                let obsX = Math.floor(Math.random() * tileCount);
+                let obsY = Math.floor(Math.random() * tileCount);
+                if (obsX !== snake[0].x || obsY !== snake[0].y) {
+                    obstaclesArray.push({ x: obsX, y: obsY });
+                }
+            }
+        }
+
+        function levelUpGame() {
+            currentLevelNumber++;
+            obstaclesArray = []; 
+            normalFoodEaten = 0;
+            
+            let lvlUpSound = document.getElementById("levelUpSound");
+            if (lvlUpSound) lvlUpSound.play();
+            
+            let gameCanvas = document.getElementById("gameCanvas");
+            if (currentLevelNumber === 2) {
+                gameCanvas.style.borderColor = "#00e5ff";
+                gameCanvas.style.boxShadow = "0 0 20px #00e5ff";
+                gameSpeed = Math.max(60, gameSpeed - 30);
+            } else if (currentLevelNumber === 3) {
+                gameCanvas.style.borderColor = "#ff0055";
+                gameCanvas.style.boxShadow = "0 0 25px #ff0055";
+                gameSpeed = Math.max(40, gameSpeed - 30);
+            }
+            generateFood();
+        }
+        function checkGameOver() {
+            const head = snake[0];
+            for (let i = 1; i < snake.length; i++) {
+                if (snake[i].x === head.x && snake[i].y === head.y) return true;
+            }
+            return false;
+        }
+        function triggerGameOver() {
+            isGameOver = true;
+            let bgMusic = document.getElementById("bgMusic");
+            if (bgMusic) { bgMusic.pause(); bgMusic.currentTime = 0; }
+
+            let goSound = document.getElementById("gameOverSound");
+            if (goSound) {
+                goSound.currentTime = 3.9; 
+                goSound.play().catch(e => console.log("Audio play error"));
+
+                setTimeout(() => {
+                    goSound.pause();
+                    goSound.currentTime = 0; 
+                }, 2300); 
+            }
+
+            document.getElementById("finalScore").innerText = score;
+            document.getElementById("gameOverScreen").style.display = "flex";
+        }
+
+        function resetGame() {
+            snake = [{x: 10, y: 10}, {x: 9, y: 10}, {x: 8, y: 10}];
+            dx = 1; dy = 0; score = 0;
+            snakeColor = "#00ffff";
+            isGameOver = false; isPaused = false; isMenuOpen = false;
+            hasGameStarted = true;
+            
+            currentLevelNumber = 1;
+            normalFoodEaten = 0;
+            isSpecialFoodActive = false;
+            obstaclesArray = [];
+            clearTimeout(specialFoodTimer);
+            gameSpeed = defaultSpeed;
+
+            let gameCanvas = document.getElementById("gameCanvas");
+            gameCanvas.style.borderColor = "#00ff66";
+            gameCanvas.style.boxShadow = "0 0 15px #00ff66";
+
+            document.getElementById("score").innerText = score;
+            document.getElementById("gameOverScreen").style.display = "none";
+            document.getElementById("settingsScreen").style.display = "none";
+            
+            let bgMusic = document.getElementById("bgMusic");
+            if (bgMusic) { bgMusic.pause(); bgMusic.currentTime = 0; }
+            
+            generateFood();
+        }
+function backToMainMenu() {
+    // 1. Screens toggle kiye
+    document.getElementById("gameOverScreen").style.display = "none";
+    document.getElementById("settingsScreen").style.display = "flex";
+    
+    // 2. States ko mukammal reset kiya taake agla match freeze na ho
+    isGameOver = false;
+    isMenuOpen = true;
+    hasGameStarted = false; 
+    isPaused = false;
+    
+    score = 0;
+    document.getElementById("score").innerText = score;
+
+    // 3. Snake ki body aur direction fresh set kiye
+    snake = [{x: 10, y: 10}, {x: 9, y: 10}, {x: 8, y: 10}];
+    dx = 1; 
+    dy = 0;
+    snakeColor = "#00ffff";
+    
+    // Hard mode parameters flush kiye
+    currentLevelNumber = 1;
+    normalFoodEaten = 0;
+    isSpecialFoodActive = false;
+    obstaclesArray = [];
+    clearTimeout(specialFoodTimer);
+    gameSpeed = defaultSpeed;
+
+    // Canvas border wapas original green kiya
+    let gameCanvas = document.getElementById("gameCanvas");
+    if(gameCanvas) {
+        gameCanvas.style.borderColor = "#00ff66";
+        gameCanvas.style.boxShadow = "0 0 15px #00ff66";
+    }
+    
+    // Lobby music wapas play kiya
+    let bgMusic = document.getElementById("bgMusic");
+    if (bgMusic) {
+        bgMusic.currentTime = 0;
+        bgMusic.play().catch(e => console.log("BGM loop online"));
+    }
+    
+    generateFood();
+    drawGame(); 
+}
+function drawGame() {
+    ctx.fillStyle = "#111522";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // 1. GOL MATOL SNAKE RENDERING
+    snake.forEach((part, index) => {
+        let centerX = part.x * gridSize + gridSize / 2;
+        let centerY = part.y * gridSize + gridSize / 2;
+        let radius = gridSize / 2 - 1;
+
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+        ctx.fillStyle = (index === 0) ? "#ffffff" : snakeColor;
+        ctx.fill();
+        ctx.closePath();
+    });
+
+    // 2. TARGET DANA: BILKUL GOL BUBBLE (Flashing neon circle)
+    if (!isSpecialFoodActive) {
+        let foodCenterX = food.x * gridSize + gridSize / 2;
+        let foodCenterY = food.y * gridSize + gridSize / 2;
+        let foodRadius = gridSize / 2 - 1;
+
+        ctx.beginPath();
+        ctx.arc(foodCenterX, foodCenterY, foodRadius, 0, 2 * Math.PI);
+        ctx.fillStyle = foodFlashToggle ? foodColor : "#ffffff";
+        ctx.fill();
+        ctx.closePath();
+    }
+    // 3. FIXED: MEDIUM MODE POISON DEEWAR (Exact horizontally double block "=" banaya)
+                if (currentMode === "Medium" && badFood.x !== -1) {
+        ctx.fillStyle = "#FF6600";
+        
+        // Loop shuru hoga 3 se aur khatam hoga tileCount - 3 par (dono sides se 3-3 block ka gap)
+        for (let i = 3; i < tileCount - 3; i++) {
+            // 1. Upar wali deewar: Top border se exact 5 block neeche (Y: 5)
+            ctx.fillRect(i * gridSize + 1, 5 * gridSize + 1, gridSize - 2, gridSize - 2);
+            
+            // 2. Neeche wali deewar: Bottom border (19) se exact 5 block upar (19 - 5 = Y: 14)
+            ctx.fillRect(i * gridSize + 1, 14 * gridSize + 1, gridSize - 2, gridSize - 2);
+        }
+    }
+
+    // 4. HARD MODE GOLD TARGET FOOD
+    if (currentMode === "Hard" && isSpecialFoodActive) {
+        ctx.fillStyle = "#FFD700";
+        ctx.shadowColor = "#FFD700";
+        ctx.shadowBlur = 15;
+        ctx.fillRect(specialFoodX * gridSize + 1, specialFoodY * gridSize + 1, gridSize - 2, gridSize - 2);
+        ctx.shadowBlur = 0;
+    }
+
+    // 5. HARD MODE ORANGE OBSTACLES
+    if (currentMode === "Hard") {
+        ctx.fillStyle = "#FF6600";
+        obstaclesArray.forEach(obs => {
+            ctx.fillRect(obs.x * gridSize + 1, obs.y * gridSize + 1, gridSize - 2, gridSize - 2);
+        });
+    }
+
+    if (isPaused && !isGameOver) {
+        ctx.fillStyle = "#00ffff";
+        ctx.font = "bold 30px Arial";
+        ctx.textAlign = "center";
+        ctx.fillText("⏸ PAUSED", canvas.width / 2, canvas.height / 2);
+    }
+}
+
+        function handlePlayPauseToggle() {
+            isPaused = !isPaused;
+        }
+        function changeDirection(dir) {
+            if (dir === 'UP' && dy === 0) { dx = 0; dy = -1; }
+            else if (dir === 'DOWN' && dy === 0) { dx = 0; dy = 1; }
+            else if (dir === 'LEFT' && dx === 0) { dx = -1; dy = 0; }
+            else if (dir === 'RIGHT' && dx === 0) { dx = 1; dy = 0; }
+        }
+
+        const settingsScreen = document.getElementById("settingsScreen");
+        const externalButtonsPad = document.getElementById("externalButtonsPad");
+        
+        document.getElementById("btnMenu").addEventListener("click", () => {
+            if (isGameOver) return;
+            isMenuOpen = true;
+            settingsScreen.style.display = "flex";
+        });
+        document.getElementById("btnCloseMenu").addEventListener("click", () => {
+            isMenuOpen = false;
+            settingsScreen.style.display = "none";
+            
+            // 🚀 Engine unfreeze kiya taake direct close menu par bhi saamp chal pare
+            if (!isGameOver && !hasGameStarted) {
+                hasGameStarted = true;
+                
+                let bgMusic = document.getElementById("bgMusic");
+                if (bgMusic) {
+                    bgMusic.pause();
+                    bgMusic.currentTime = 0;
+                }
+            }
+        });
+        document.getElementById("btnRestart").addEventListener("click", () => {
+            resetGame();
+        });
+
+        document.getElementById("btnBackToMenu").addEventListener("click", () => {
+            backToMainMenu();
+        });
+
+        document.getElementById("btnLogout").addEventListener("click", () => {
+            localStorage.removeItem("isLoggedIn");
+            alert("account log out!");
+            window.location.href = "login.html";
+        });
+
+        function setControls(type) {
+            controlType = type;
+            if (type === "Buttons") {
+                document.getElementById("ctrlBtnMode").classList.add("active");
+                document.getElementById("ctrlTouchMode").classList.remove("active");
+                externalButtonsPad.style.display = "grid";
+            } else {
+                document.getElementById("ctrlBtnMode").classList.remove("active");
+                document.getElementById("ctrlTouchMode").classList.add("active");
+                externalButtonsPad.style.display = "none";
+            }
+        }
+        document.getElementById("ctrlBtnMode").addEventListener("click", () => setControls("Buttons"));
+        document.getElementById("ctrlTouchMode").addEventListener("click", () => setControls("Touch"));
+
+        function setSpeed(sp, val) {
+            defaultSpeed = val;
+            if(!isSpecialFoodActive) gameSpeed = val;
+            document.getElementById("spdSlow").classList.remove("active");
+            document.getElementById("spdNormal").classList.remove("active");
+            document.getElementById("spdFast").classList.remove("active");
+            document.getElementById(sp).classList.add("active");
+        }
+        document.getElementById("spdSlow").addEventListener("click", () => setSpeed("spdSlow", 220));
+        document.getElementById("spdNormal").addEventListener("click", () => setSpeed("spdNormal", 160));
+        document.getElementById("spdFast").addEventListener("click", () => setSpeed("spdFast", 100));
+
+        function setMode(lvl, modeName) {
+            currentMode = modeName;
+            document.getElementById("lvlEasy").classList.remove("active");
+            document.getElementById("lvlMedium").classList.remove("active");
+            document.getElementById("lvlHard").classList.remove("active");
+            document.getElementById(lvl).classList.add("active");
+            resetGame();
+        }
+        document.getElementById("lvlEasy").addEventListener("click", () => setMode("lvlEasy", "Easy"));
+        document.getElementById("lvlMedium").addEventListener("click", () => setMode("lvlMedium", "Medium"));
+        document.getElementById("lvlHard").addEventListener("click", () => setMode("lvlHard", "Hard"));
+
+        document.getElementById("gUp").addEventListener("click", () => changeDirection('UP'));
+        document.getElementById("gLeft").addEventListener("click", () => changeDirection('LEFT'));
+        document.getElementById("gDown").addEventListener("click", () => changeDirection('DOWN'));
+        document.getElementById("gRight").addEventListener("click", () => changeDirection('RIGHT'));
+
+        window.addEventListener("keydown", (e) => {
+            if (e.key === "ArrowUp") changeDirection('UP');
+            else if (e.key === "ArrowDown") changeDirection('DOWN');
+            else if (e.key === "ArrowLeft") changeDirection('LEFT');
+            else if (e.key === "ArrowRight") changeDirection('RIGHT');
+            else if (e.key === " " || e.key === "p") handlePlayPauseToggle();
+        });
+
+        const touchZone = document.getElementById("touchZone");
+        let touchStartX = 0, touchStartY = 0; let lastTap = 0;
+
+        touchZone.addEventListener("touchstart", (e) => {
+            const currentTime = new Date().getTime();
+            const tapLength = currentTime - lastTap;
+            if (tapLength < 300 && tapLength > 0) {
+                e.preventDefault(); handlePlayPauseToggle(); return;
+            }
+            lastTap = currentTime;
+            
+            if (e.touches && e.touches.length > 0) {
+                touchStartX = e.touches[0].clientX; 
+                touchStartY = e.touches[0].clientY;
+            }
+        }, {passive: true});
+
+        touchZone.addEventListener("touchend", (e) => {
+            if (isPaused || isGameOver || isMenuOpen || controlType !== "Touch") return;
+            
+            if (e.changedTouches && e.changedTouches.length > 0) {
+                let touchEndX = e.changedTouches[0].clientX; 
+                let touchEndY = e.changedTouches[0].clientY;
+                
+                let diffX = touchEndX - touchStartX; 
+                let diffY = touchEndY - touchStartY;
+
+                if (Math.abs(diffX) > Math.abs(diffY)) {
+                    if (Math.abs(diffX) > 8) {
+                        if (diffX > 0) changeDirection('RIGHT'); else changeDirection('LEFT');
+                    }
+                } else {
+                    if (Math.abs(diffY) > 8) {
+                        if (diffY > 0) changeDirection('DOWN'); else changeDirection('UP');
+                    }
+                }
+            }
+        }, {passive: true});
+              // BGM Volume Toggle Management
+        document.getElementById("btnToggleBGM").addEventListener("click", () => {
+            isBGMEnabled = !isBGMEnabled;
+            let bgMusic = document.getElementById("bgMusic");
+            let btn = document.getElementById("btnToggleBGM");
+            
+            if (isBGMEnabled) {
+                btn.classList.add("active");
+                btn.innerText = "🎵 BGM: ON";
+                if (hasGameStarted && !isPaused && !isMenuOpen && !isGameOver) {
+                    bgMusic.play().catch(e => console.log("BGM play error"));
+                }
+            } else {
+                btn.classList.remove("active");
+                btn.innerText = "🎵 BGM: OFF";
+                if (bgMusic) bgMusic.pause();
+            }
+        });
+
+        // Sound Effects Volume Toggle Management
+        document.getElementById("btnToggleSFX").addEventListener("click", () => {
+            isSFXEnabled = !isSFXEnabled;
+            let btn = document.getElementById("btnToggleSFX");
+            
+            if (isSFXEnabled) {
+                btn.classList.add("active");
+                btn.innerText = "🔊 SOUND: ON";
+            } else {
+                btn.classList.remove("active");
+                btn.innerText = "🔊 SOUND: OFF";
+            }
+        });
+
+    </script>
+</body>
+</html>
