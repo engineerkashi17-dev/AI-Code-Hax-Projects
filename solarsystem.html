@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Code Hax - Ultra Reality Solar System</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background-color: #010104; overflow: hidden; display: flex; justify-content: center; align-items: center; height: 100vh; font-family: 'Courier New', Courier, monospace; }
+        canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; }
+        .btn-container { position: absolute; bottom: 30px; z-index: 2; width: 100%; display: flex; justify-content: center; gap: 15px; }
+        .portal-btn { background: linear-gradient(135deg, #ff6600, #9400d3); color: white; border: none; padding: 14px 35px; font-size: 1rem; font-weight: bold; border-radius: 50px; cursor: pointer; box-shadow: 0 0 15px rgba(255, 102, 0, 0.4); text-transform: uppercase; font-family: sans-serif; letter-spacing: 1px;}
+        .portal-btn:active { transform: scale(0.95); }
+    </style>
+</head>
+<body>
+
+    <canvas id="universeCanvas"></canvas>
+    <div class="btn-container">
+        <button class="portal-btn" onclick="zoomIn()">Zoom In</button>
+        <button class="portal-btn" onclick="zoomOut()">Zoom Out</button>
+    </div>
+    <script>
+        const canvas = document.getElementById('universeCanvas');
+        const ctx = canvas.getContext('2d');
+
+        function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        window.addEventListener('resize', resize);
+        resize();
+
+        // Locked Matrix Zoom Settings
+        let currentZoom = 1.0; let targetZoom = 1.0;
+        function zoomOut() { if(targetZoom > 0.26) targetZoom -= 0.25; } 
+        function zoomIn() { if(targetZoom < 1.5) targetZoom += 0.25; }
+
+        // Starfield Engine
+        const stars = [];
+        for(let i=0; i<250; i++) { stars.push({ x: Math.random()*4000 - 2000, y: Math.random()*4000 - 2000, size: Math.random()*1.5 }); }
+
+        // Dum Wale Sitare (Comets with neon particles)
+        const comets = [];
+        for(let i=0; i<8; i++) { comets.push({ x: Math.random()*4000-2000, y: Math.random()*4000-2000, speedX: Math.random()*7+5, speedY: Math.random()*4+2, size: Math.random()*2+1 }); }
+
+        // Asteroids Belt
+        const asteroids = [];
+        for(let i=0; i<120; i++) { asteroids.push({ dist: Math.random()*(150-135)+135, angle: Math.random()*Math.PI*2, speed: Math.random()*0.006+0.004, size: Math.random()*1.2 }); }
+
+        // Pic 2 Style Enhanced Big Colored Planets Database with English/Urdu Mixed Names
+        const planets = [
+            { name: 'Mercury (Atarid)', r: 12, dist: 90, speed: 0.03, color: '#85929e', angle: 0 },
+            { name: 'Venus (Zohra)', r: 18, dist: 140, speed: 0.022, color: '#e59866', angle: 1 },
+            { name: 'Earth (Zameen)', r: 20, dist: 200, speed: 0.016, color: '#2e86c1', angle: 2, hasMoon: true, mDist: 26, mSpeed: 0.07, mAngle: 0 },
+            { name: 'Mars (Mreekh)', r: 16, dist: 260, speed: 0.013, color: '#cd6155', angle: 3 },
+            { name: 'Jupiter (Mushtari)', r: 35, dist: 350, speed: 0.009, color: '#f5cba7', angle: 4 },
+            { name: 'Saturn (Zuhal)', r: 28, dist: 460, speed: 0.007, color: '#f4d03f', angle: 5, hasRing: true },
+            { name: 'Uranus (Arun)', r: 22, dist: 550, speed: 0.005, color: '#76d7c4', angle: 6 },
+            { name: 'Neptune (Varun)', r: 21, dist: 630, speed: 0.004, color: '#34495e', angle: 7 }
+        ];
+
+        // Galaxies Vectors Pools
+        const galaxy1Particles = []; const galaxy2Particles = [];
+        function createSpiralGalaxy(pool, count, colorHex) {
+            for(let i=0; i<count; i++) {
+                let arm = i % 2 === 0 ? 0 : Math.PI; let theta = i * 0.035; let r = 2.2 * i;
+                pool.push({ theta: theta + arm, r: r, color: colorHex, scatter: r * 0.22 });
+            }
+        }
+        createSpiralGalaxy(galaxy1Particles, 450, '#00e5ff');
+        createSpiralGalaxy(galaxy2Particles, 200, '#ff00bb');
+
+        let sunRotation = 0; let supernovaPulse = 0; let globalRotation = 0;
+        function animate() {
+            ctx.fillStyle = 'rgba(1, 1, 4, 0.25)'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+            currentZoom += (targetZoom - currentZoom) * 0.04;
+
+            ctx.save();
+            ctx.translate(canvas.width / 2, canvas.height / 2);
+            ctx.scale(currentZoom, currentZoom);
+
+            // Background Stars
+            ctx.fillStyle = '#ffffff'; stars.forEach(s => ctx.fillRect(s.x, s.y, s.size, s.size));
+
+            // Render Comets with long shiny neon tails
+            comets.forEach(c => {
+                c.x += c.speedX; c.y += c.speedY;
+                if(c.x > 2000 || c.y > 2000) { c.x = -2000; c.y = Math.random()* -1000; }
+                ctx.beginPath();
+                let tail = ctx.createLinearGradient(c.x, c.y, c.x - 60, c.y - 30);
+                tail.addColorStop(0, '#ffffff'); tail.addColorStop(0.3, '#ffaa00'); tail.addColorStop(1, 'transparent');
+                ctx.strokeStyle = tail; ctx.lineWidth = c.size;
+                ctx.moveTo(c.x, c.y); ctx.lineTo(c.x - 60, c.y - 30); ctx.stroke();
+            });
+
+            sunRotation += 0.02;
+            globalRotation += 0.002;
+
+            // ==========================================
+            // VISUAL CORE FIX: REALISTIC HIGH-GLOW SUN BALL (Pic 2 Style)
+            // ==========================================
+            ctx.save();
+            ctx.rotate(sunRotation);
+            // Dynamic multi-layer radial fusion aura rings mapping
+            for (let ring = 0; ring < 4; ring++) {
+                let sizeOffset = ring * 10;
+                let sunGlow = ctx.createRadialGradient(0, 0, 15, 0, 0, 45 + sizeOffset);
+                sunGlow.addColorStop(0, '#ffffff');       // Core Core center
+                sunGlow.addColorStop(0.2, '#ffcc00');     // Golden active zone
+                sunGlow.addColorStop(0.5, '#ff4500');     // Deep plasma fire edges
+                sunGlow.addColorStop(1, 'transparent');   // Ambient space integration
+                ctx.fillStyle = sunGlow;
+                ctx.beginPath(); ctx.arc(0, 0, 45 + sizeOffset, 0, Math.PI * 2); ctx.fill();
+            }
+            // Add bold "The Sun (Suraj)" and "Singularity" system textures overlay
+            ctx.fillStyle = '#ffffff'; ctx.font = 'bold 11px Arial'; ctx.textAlign = 'center';
+            ctx.fillText("The Sun (Suraj)", 0, -55);
+            ctx.restore();
+
+            // ==========================================
+            // STAGE 1: SYSTEM PLANETS ORBITS (Zoom > 0.45)
+            // ==========================================
+            if (currentZoom > 0.45) {
+                planets.forEach(p => {
+                    ctx.beginPath(); ctx.ellipse(0, 0, p.dist, p.dist*0.5, 0, 0, Math.PI*2);
+                    ctx.strokeStyle = 'rgba(255, 102, 0, 0.025)'; ctx.lineWidth = 1; ctx.stroke();
+
+                    p.angle += p.speed; const px = Math.cos(p.angle) * p.dist; const py = Math.sin(p.angle) * p.dist * 0.5;
+
+                    if(p.hasRing) {
+                        ctx.beginPath(); ctx.ellipse(px, py, p.r*1.6, p.r*0.5, 0, 0, Math.PI*2);
+                        ctx.strokeStyle = 'rgba(244, 208, 63, 0.25)'; ctx.lineWidth = 4; ctx.stroke();
+                    }
+
+                    ctx.beginPath(); ctx.arc(px, py, p.r, 0, Math.PI*2); ctx.fillStyle = p.color; ctx.fill();
+                    
+                    // High-Visibility Bold Labels matching Pic 2 template style
+                    ctx.fillStyle = '#ffffff'; ctx.font = 'bold 12px Arial'; ctx.textAlign = 'center';
+                    ctx.fillText(p.name, px, py - p.r - 6);
+
+                    if(p.hasMoon) {
+                        p.mAngle += p.mSpeed;
+                        const mx = px + Math.cos(p.mAngle)*p.mDist; const my = py + Math.sin(p.mAngle)*p.mDist*0.4;
+                        ctx.beginPath(); ctx.arc(mx, my, 3, 0, Math.PI*2); ctx.fillStyle = '#ffffff'; ctx.fill();
+                    }
+                });
+
+                asteroids.forEach(ast => { ast.angle += ast.speed; ctx.fillStyle = 'rgba(170, 170, 180, 0.4)'; ctx.fillRect(Math.cos(ast.angle)*ast.dist, Math.sin(ast.angle)*ast.dist*0.5, ast.size, ast.size); });
+            }
+
+            // ==========================================
+            // STAGE 2: RED GIANT & PULSATING SUPERNOVA (Zoom 0.25 to 0.6)
+            // ==========================================
+            if (currentZoom <= 0.6 && currentZoom > 0.2) {
+                ctx.save(); ctx.rotate(globalRotation);
+                let rgGlow = ctx.createRadialGradient(-250, -150, 5, -250, -150, 60); rgGlow.addColorStop(0, '#ffcc00'); rgGlow.addColorStop(0.5, '#ff3300'); rgGlow.addColorStop(1, 'transparent');
+                ctx.fillStyle = rgGlow; ctx.beginPath(); ctx.arc(-250, -150, 60, 0, Math.PI*2); ctx.fill();
+
+                let sgGlow = ctx.createRadialGradient(300, 200, 5, 300, 200, 80); sgGlow.addColorStop(0, '#ffffff'); sgGlow.addColorStop(0.4, '#0066ff'); sgGlow.addColorStop(1, 'transparent');
+                ctx.fillStyle = sgGlow; ctx.beginPath(); ctx.arc(300, 200, 80, 0, Math.PI*2); ctx.fill();
+
+                supernovaPulse += 0.05; let blastRadius = 90 + Math.sin(supernovaPulse) * 8;
+                let snGlow = ctx.createRadialGradient(0, 0, 10, 0, 0, blastRadius); snGlow.addColorStop(0, '#ffffff'); snGlow.addColorStop(0.2, '#ff00aa'); snGlow.addColorStop(0.6, '#7000ff'); snGlow.addColorStop(1, 'transparent');
+                ctx.fillStyle = snGlow; ctx.beginPath(); ctx.arc(0, 0, blastRadius, 0, Math.PI*2); ctx.fill();
+                ctx.fillStyle = '#ff00aa'; ctx.font = '14px Courier'; ctx.fillText("💥 SUPERNOVA BLAST 💥", -70, -blastRadius - 10);
+                ctx.restore();
+            }
+
+            // ==========================================
+            // STAGE 3: INTERSTELLAR NEBULA CLOUDS (Zoom 0.15 to 0.35)
+            // ==========================================
+            if (currentZoom <= 0.35 && currentZoom > 0.12) {
+                ctx.save(); ctx.rotate(-globalRotation * 0.4);
+                for (let i = 0; i < 4; i++) {
+                    let nx = Math.cos(i * Math.PI / 2) * 500; let ny = Math.sin(i * Math.PI / 2) * 400;
+                    let nebGlow = ctx.createRadialGradient(nx, ny, 30, nx, ny, 300);
+                    if(i % 2 === 0) { nebGlow.addColorStop(0, 'rgba(0, 255, 150, 0.12)'); nebGlow.addColorStop(0.6, 'rgba(0, 150, 255, 0.04)'); }
+                    else { nebGlow.addColorStop(0, 'rgba(255, 0, 100, 0.12)'); nebGlow.addColorStop(0.6, 'rgba(120, 0, 255, 0.04)'); }
+                    nebGlow.addColorStop(1, 'transparent'); ctx.fillStyle = nebGlow; ctx.beginPath(); ctx.arc(nx, ny, 300, 0, Math.PI*2); ctx.fill();
+                }
+                ctx.restore();
+            }
+
+            // ==========================================
+            // STAGE 4: HIGH-DENSITY PARTICLE GALAXIES (Zoom <= 0.25)
+            // ==========================================
+            if (currentZoom <= 0.25) {
+                ctx.save(); ctx.rotate(globalRotation * 0.5);
+
+                galaxy1Particles.forEach(part => {
+                    let gx = Math.cos(part.theta) * part.r + (Math.random()-0.5) * part.scatter;
+                    let gy = Math.sin(part.theta) * part.r * 0.6 + (Math.random()-0.5) * part.scatter;
+                    ctx.fillStyle = part.color; ctx.fillRect(gx, gy, 2, 2);
+                });
+
+                ctx.save();
+                ctx.translate(1100, -700); ctx.rotate(-globalRotation * 0.2);
+                galaxy2Particles.forEach(part => {
+                    let gx = Math.cos(part.theta) * part.r + (Math.random()-0.5) * part.scatter;
+                    let gy = Math.sin(part.theta) * part.r * 0.5 + (Math.random()-0.5) * part.scatter;
+                    ctx.fillStyle = part.color; ctx.fillRect(gx, gy, 1.5, 1.5);
+                });
+                ctx.restore();
+
+                ctx.fillStyle = '#00ffaa'; ctx.font = '35px Courier New'; ctx.textAlign = 'center';
+                ctx.fillText("COSMIC DEEP HORIZON", 0, -550);
+                ctx.font = '22px Courier New'; ctx.fillStyle = '#ffffff';
+                ctx.fillText("Milky Way & Andromeda Core", 0, -500);
+                ctx.restore();
+            }
+
+            ctx.restore();
+            requestAnimationFrame(animate);
+        }
+        animate();
+    </script>
+</body>
+</html>
