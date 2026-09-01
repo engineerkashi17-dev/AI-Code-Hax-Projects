@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>3D Touch Interactive Cube</title>
+    <style>
+        /* === CSS DESIGNING === */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: #0a0a16;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            perspective: 1000px;
+            /* Explicitly disables default touch scrolls on the body for standard mobile views */
+            touch-action: none; 
+        }
+
+        h1 {
+            color: #00ffc8;
+            font-size: 22px;
+            margin-bottom: 50px;
+            letter-spacing: 1px;
+            text-align: center;
+            text-shadow: 0 0 10px rgba(0, 255, 200, 0.3);
+        }
+
+        .cube-container {
+            width: 140px;
+            height: 140px;
+            position: relative;
+            margin-bottom: 60px;
+        }
+
+        .cube {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            transform-style: preserve-3d;
+            transform: rotateX(-30deg) rotateY(45deg);
+            transition: transform 0.05s linear;
+        }
+
+        /* Common Face Configuration */
+        .face {
+            position: absolute;
+            width: 140px;
+            height: 140px;
+            color: #fff;
+            font-size: 22px;
+            font-weight: bold;
+            font-family: 'Courier New', Courier, monospace;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            backface-visibility: visible;
+            user-select: none;
+        }
+
+        /* === 3D COORDINATES WITH SEPARATE NEON TINTS === */
+        .front  { 
+            transform: translateZ(70px); 
+            background: rgba(0, 255, 200, 0.12);
+            border: 2px solid #00ffc8;
+            box-shadow: 0 0 20px rgba(0, 255, 200, 0.5);
+            text-shadow: 0 0 8px #00ffc8;
+        }
+        .back   { 
+            transform: rotateY(180deg) translateZ(70px); 
+            background: rgba(255, 0, 127, 0.12);
+            border: 2px solid #ff007f;
+            box-shadow: 0 0 20px rgba(255, 0, 127, 0.5);
+            text-shadow: 0 0 8px #ff007f;
+        }
+        .right  { 
+            transform: rotateY(90deg) translateZ(70px); 
+            background: rgba(157, 0, 255, 0.12);
+            border: 2px solid #9d00ff;
+            box-shadow: 0 0 20px rgba(157, 0, 255, 0.5);
+            text-shadow: 0 0 8px #9d00ff;
+        }
+        .left   { 
+            transform: rotateY(-90deg) translateZ(70px); 
+            background: rgba(255, 234, 0, 0.12);
+            border: 2px solid #ffea00;
+            box-shadow: 0 0 20px rgba(255, 234, 0, 0.5);
+            text-shadow: 0 0 8px #ffea00;
+        }
+        .top    { 
+            transform: rotateX(90deg) translateZ(70px); 
+            background: rgba(0, 229, 255, 0.12);
+            border: 2px solid #00e5ff;
+            box-shadow: 0 0 20px rgba(0, 229, 255, 0.5);
+            text-shadow: 0 0 8px #00e5ff;
+        }
+        .bottom { 
+            transform: rotateX(-90deg) translateZ(70px); 
+            background: rgba(0, 255, 17, 0.12);
+            border: 2px solid #00ff11;
+            box-shadow: 0 0 20px rgba(0, 255, 17, 0.5);
+            text-shadow: 0 0 8px #00ff11;
+        }
+
+        /* === BRANDING AREA AT BOTTOM === */
+        .developer-details {
+            font-size: 15px;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+            margin-top: 20px;
+        }
+        .dev-red { color: #ff3333; }
+        .handle-neon {
+            transition: color 0.5s ease, text-shadow 0.5s ease;
+            animation: softPulse 1s infinite alternate;
+        }
+        @keyframes softPulse {
+            0% { opacity: 0.6; }
+            100% { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>3D Interactive Matrix</h1>
+
+    <div class="cube-container">
+        <div class="cube" id="cube">
+            <div class="face front">CODE</div>
+            <div class="face back">AI</div>
+            <div class="face right">HAX</div>
+            <div class="face left">HTML</div>
+            <div class="face top">JS</div>
+            <div class="face bottom">CSS</div>
+        </div>
+    </div>
+
+    <div class="developer-details">
+        <span class="dev-red">Developer:</span>
+        <span class="handle-neon" id="neon-handle">@aicodehax</span>
+    </div>
+
+    <!-- === JAVASCRIPT LOGIC === -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const cube = document.getElementById('cube');
+            const neonHandle = document.getElementById('neon-handle');
+            
+            let isDragging = false;
+            let previousTouchPosition = { x: 0, y: 0 };
+            let rotation = { x: -30, y: 45 };
+
+            // 1. Random Neon Color Loop for Branding
+            const neonColors = ['#00ffc8', '#ff007f', '#00e5ff', '#ffea00', '#9d00ff', '#ff5500', '#00ff11', '#ff00aa'];
+            setInterval(() => {
+                const randomColor = neonColors[Math.floor(Math.random() * neonColors.length)];
+                neonHandle.style.color = randomColor;
+                neonHandle.style.textShadow = `0 0 10px ${randomColor}, 0 0 20px ${randomColor}`;
+            }, 1000);
+
+            // 2. Mobile Touch Event Listeners with explicitly set passive:false override
+            document.addEventListener('touchstart', (e) => {
+                isDragging = true;
+                previousTouchPosition = {
+                    x: e.touches[0].clientX,
+                    y: e.touches[0].clientY
+                };
+            }, { passive: false });
+
+            document.addEventListener('touchmove', (e) => {
+                if (!isDragging) return;
+                
+                // CRITICAL CRACK: Prevents default Android viewport matrix refresh
+                e.preventDefault(); 
+
+                const deltaMove = {
+                    x: e.touches[0].clientX - previousTouchPosition.x,
+                    y: e.touches[0].clientY - previousTouchPosition.y
+                };
+
+                rotation.y += deltaMove.x * 0.6;
+                rotation.x -= deltaMove.y * 0.6;
+
+                cube.style.transform = `rotateX(${rotation.x}deg) rotateY(${rotation.y}deg)`;
+
+                previousTouchPosition = {
+                    x: e.touches[0].clientX,
+                    y: e.touches[0].clientY
+                };
+            }, { passive: false }); // Bypasses Chrome passive scroll policy
+
+            document.addEventListener('touchend', () => {
+                isDragging = false;
+            });
+        });
+    </script>
+</body>
+</html>

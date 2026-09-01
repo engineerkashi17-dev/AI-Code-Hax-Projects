@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Voice & Command Center</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #1e1e24;
+            color: #ffffff;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: background-color 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            overflow: hidden;
+        }
+
+        .voice-container {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            width: 90%;
+            max-width: 380px;
+        }
+
+        h1 {
+            font-size: 22px;
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+            color: #00ffc8;
+        }
+
+        .instruction {
+            font-size: 13px;
+            color: #ccc;
+            margin-bottom: 25px;
+        }
+
+        /* Neon Command Input Box (Bilkul Saaf aur Khali) */
+        .cmd-input {
+            width: 100%;
+            padding: 12px 20px;
+            background: rgba(0, 0, 0, 0.4);
+            border: 2px solid #00ffc8;
+            border-radius: 50px;
+            color: #fff;
+            font-size: 16px;
+            text-align: center;
+            outline: none;
+            margin-bottom: 20px;
+            box-shadow: 0 0 15px rgba(0, 255, 200, 0.2);
+            transition: box-shadow 0.3s;
+        }
+
+        .cmd-input:focus {
+            box-shadow: 0 0 25px rgba(0, 255, 200, 0.5);
+        }
+
+        .status-box {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 15px;
+            text-align: left;
+            margin-bottom: 20px;
+        }
+
+        #status {
+            font-weight: bold;
+            color: #2ed573;
+        }
+
+        #spoken-word {
+            font-weight: bold;
+            color: #70a1ff;
+            text-transform: uppercase;
+        }
+
+        /* === NICHE WALA BRANDING AREA === */
+        .developer-details {
+            font-size: 14px;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+            margin-top: 10px;
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        /* Developer text strictly FIX RED color */
+        .dev-red {
+            color: #ff3333;
+        }
+
+        /* @aicodehax with Dynamic Neon Color Blinking Effect */
+        .handle-neon {
+            transition: color 0.5s ease, text-shadow 0.5s ease;
+            animation: fastBlink 1s infinite alternate;
+        }
+
+        @keyframes fastBlink {
+            0% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="voice-container">
+        <h1>AI Command Center</h1>
+        <p class="instruction">Type a color name or AI command below!</p>
+        
+        <!-- Input box bilkul clear command enter karne ke liye -->
+        <input type="text" class="cmd-input" id="cmd-field" placeholder="Enter color (e.g. Red, Blue)..." autocomplete="off">
+        
+        <div class="status-box">
+            <p>System: <span id="status">Online</span></p>
+            <p>Executed: <span id="spoken-word">...</span></p>
+        </div>
+        
+        <!-- Aapki demand ke mutabik customized layout sabse niche -->
+        <div class="developer-details">
+            <span class="dev-red">Developer:</span>
+            <span class="handle-neon" id="neon-handle">@aicodehax</span>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const cmdField = document.getElementById('cmd-field');
+            const statusText = document.getElementById('status');
+            const spokenWord = document.getElementById('spoken-word');
+            const neonHandle = document.getElementById('neon-handle');
+
+            // List of vibrant neon colors for random change
+            const neonColors = [
+                '#00ffc8', '#ff007f', '#00e5ff', '#ffea00', 
+                '#9d00ff', '#ff5500', '#00ff11', '#ff00aa'
+            ];
+
+            // Function to change @aicodehax color randomly every second
+            setInterval(() => {
+                const randomColor = neonColors[Math.floor(Math.random() * neonColors.length)];
+                neonHandle.style.color = randomColor;
+                neonHandle.style.textShadow = `0 0 10px ${randomColor}, 0 0 20px ${randomColor}`;
+            }, 1000);
+
+            // Input background change logic
+            cmdField.addEventListener('input', (e) => {
+                const text = e.target.value.toLowerCase().trim().replace(/ /g, '');
+                
+                if (text.length > 0) {
+                    spokenWord.innerText = text;
+                    statusText.innerText = "Processing...";
+                    statusText.style.color = "#70a1ff";
+
+                    const s = new Option().style;
+                    s.color = text;
+                    
+                    if (s.color !== '') {
+                        document.body.style.backgroundColor = text;
+                        statusText.innerText = "Success";
+                        statusText.style.color = "#2ed573";
+                    }
+                } else {
+                    spokenWord.innerText = "...";
+                    statusText.innerText = "Online";
+                    statusText.style.color = "#2ed573";
+                    document.body.style.backgroundColor = "#1e1e24"; 
+                }
+            });
+        });
+    </script>
+</body>
+</html>
