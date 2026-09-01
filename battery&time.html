@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cyber Terminal - Battery & Time</title>
+    <style>
+        /* === CSS DESIGNING === */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        body {
+            background-color: #050505;
+            color: #00ff66;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .matrix-bg {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(rgba(0, 255, 102, 0.05) 50%, rgba(0, 0, 0, 0) 50%), linear-gradient(90deg, rgba(0, 255, 102, 0.03) 50%, rgba(0, 0, 0, 0) 50%);
+            background-size: 4px 4px;
+            z-index: 1;
+        }
+
+        .terminal-container {
+            width: 90%;
+            max-width: 400px;
+            background: rgba(10, 10, 10, 0.9);
+            border: 2px solid #00ff66;
+            border-radius: 10px;
+            box-shadow: 0 0 25px rgba(0, 255, 102, 0.3);
+            z-index: 2;
+            overflow: hidden;
+        }
+
+        .terminal-header {
+            background: #111;
+            padding: 10px;
+            border-bottom: 1px solid #00ff66;
+            display: flex;
+            align-items: center;
+        }
+
+        .dot {
+            width: 12px; height: 12px;
+            border-radius: 50%;
+            margin-right: 6px;
+        }
+        .red { background: #ff5f56; }
+        .yellow { background: #ffbd2e; }
+        .green { background: #27c93f; }
+
+        .title {
+            font-size: 11px;
+            color: #888;
+            margin-left: auto;
+        }
+
+        .terminal-body {
+            padding: 20px;
+        }
+
+        .line {
+            font-size: 13px;
+            margin-bottom: 15px;
+            letter-spacing: 1px;
+        }
+
+        .success { color: #00ffff; text-shadow: 0 0 5px #00ffff; }
+
+        .widget-box {
+            background: rgba(0, 255, 102, 0.05);
+            border: 1px dashed #00ff66;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+        }
+
+        .label { font-size: 11px; color: #888; margin-bottom: 5px;}
+        .value { font-size: 22px; font-weight: bold; text-shadow: 0 0 10px #00ff66; }
+
+        .battery-bar-container {
+            width: 100%; height: 8px;
+            background: #222;
+            border-radius: 4px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+
+        .battery-bar {
+            width: 0%; height: 100%;
+            background: #00ff66;
+            box-shadow: 0 0 8px #00ff66;
+            transition: width 0.5s ease-in-out;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.4; }
+            50% { opacity: 1; }
+            100% { opacity: 0.4; }
+        }
+        .pulse { animation: pulse 2s infinite; color: #ff0055; text-shadow: 0 0 5px #ff0055; }
+    </style>
+</head>
+<body>
+
+    <div class="matrix-bg"></div>
+    <div class="terminal-container">
+        <div class="terminal-header">
+            <span class="dot red"></span>
+            <span class="dot yellow"></span>
+            <span class="dot green"></span>
+            <span class="title">SYSTEM_OVERRIDE_OS_v4.2</span>
+        </div>
+        <div class="terminal-body">
+            <p class="line">>> INITIALIZING CYBER_LINK...</p>
+            <p class="line success">>> CONNECTION SECURE</p>
+            
+            <div class="widget-box">
+                <p class="label">CURRENT_TIME:</p>
+                <p class="value" id="live-time">00:00:00 AM</p>
+            </div>
+
+            <div class="widget-box battery-box">
+                <p class="label">MOBILE_BATTERY_LEVEL:</p>
+                <p class="value" id="battery-status">LOADING...</p>
+                <div class="battery-bar-container">
+                    <div class="battery-bar" id="battery-progress"></div>
+                </div>
+            </div>
+
+            <p class="line pulse">>> SYSTEM STATUS: ONLINE & TRACKING</p>
+        </div>
+    </div>
+
+    <!-- === JAVASCRIPT LOGIC === -->
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            // 1. Live Clock Logic
+            function updateClock() {
+                const timeElement = document.getElementById('live-time');
+                if (!timeElement) return;
+
+                const now = new Date();
+                let hours = now.getHours();
+                let minutes = now.getMinutes();
+                let seconds = now.getSeconds();
+                let ampm = hours >= 12 ? 'PM' : 'AM';
+                
+                hours = hours % 12;
+                hours = hours ? hours : 12;
+                minutes = minutes < 10 ? '0' + minutes : minutes;
+                seconds = seconds < 10 ? '0' + seconds : seconds;
+                
+                timeElement.innerText = `${hours}:${minutes}:${seconds} ${ampm}`;
+            }
+            setInterval(updateClock, 1000);
+            updateClock();
+
+            // 2. Smart Battery & Fast Charging Logic
+            const batteryStatus = document.getElementById('battery-status');
+            const batteryProgress = document.getElementById('battery-progress');
+
+            if ('getBattery' in navigator && batteryStatus && batteryProgress) {
+                navigator.getBattery().then(function(battery) {
+                    function updateBattery() {
+                        let level = Math.round(battery.level * 100);
+                        
+                        if (battery.charging) {
+                            batteryStatus.innerText = level + "% [FAST CHARGING...]";
+                            batteryProgress.style.width = level + "%";
+                            batteryProgress.style.backgroundColor = "#00ffff"; // Cyan glow
+                            batteryProgress.style.boxShadow = "0 0 15px #00ffff";
+                        } else {
+                            batteryStatus.innerText = level + "% [DISCHARGING]";
+                            batteryProgress.style.width = level + "%";
+                            
+                            if (level < 20) {
+                                batteryProgress.style.backgroundColor = "#ff0055"; // Low battery red
+                                batteryProgress.style.boxShadow = "0 0 15px #ff0055";
+                            } else {
+                                batteryProgress.style.backgroundColor = "#00ff66"; // Neon green
+                                batteryProgress.style.boxShadow = "0 0 15px #00ff66";
+                            }
+                        }
+                    }
+                    
+                    updateBattery();
+                    battery.addEventListener('levelchange', updateBattery);
+                    battery.addEventListener('chargingchange', updateBattery);
+                });
+            } else {
+                if (batteryStatus) batteryStatus.innerText = "NOT SUPPORTED";
+            }
+        });
+    </script>
+</body>
+</html>
